@@ -28,7 +28,7 @@ def ingest_data():
     reemplazo = False
     for index, row in df.iterrows():
         #print(row['principales_palabras_clave'])
-        if (index == 0 or index == 50 or not pd.isna(row['cluster'])):
+        if (index == 0 or not pd.isna(row['cluster'])):
             if(reemplazo == False):
                 indice = index
                 palabras += row['principales_palabras_clave']
@@ -43,9 +43,19 @@ def ingest_data():
                 palabras += row['principales_palabras_clave']
 
         else:
-            if palabras[len(palabras)-1] != " ":
-                palabras += " " 
-            palabras += row['principales_palabras_clave']
+            if(index == 50):
+                if palabras[len(palabras)-1] != " ":
+                    palabras += " " 
+                palabras += row['principales_palabras_clave']
+                if(palabras[len(palabras)-1] == '.'):
+                    palabras = palabras[:-1]
+                palabras = re.sub('\s{2,}', ' ', palabras)
+                df.iloc[indice, 3] = palabras
+                palabras = "" 
+            else:   
+                if palabras[len(palabras)-1] != " ":
+                    palabras += " " 
+                palabras += row['principales_palabras_clave']
 
     df.dropna(axis=0, inplace=True)
     df.reset_index(inplace=True)
